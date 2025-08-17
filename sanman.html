@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NourishHub Canteen Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background-color: #f1f5f9;
+      color: var(--dark);
+      min-height: 100vh;
+    }
+    
+    /* Navbar */
+    .navbar {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    
+    .nav-link {
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link:hover {
+      color: var(--primary);
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .blob {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: linear-gradient(180deg, rgba(79, 70, 229, 0.4) 0%, rgba(79, 70, 229, 0.1) 100%);
+      border-radius: 50%;
+      filter: blur(40px);
+      z-index: 0;
+    }
+    
+    /* Menu Card */
+    .menu-card {
+      transition: all 0.3s ease;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .menu-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Button */
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    /* Form */
+    .form-input {
+      border: 1px solid var(--gray);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .mobile-menu {
+        display: none;
+      }
+      
+      .mobile-menu.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);m 
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .animate-fadeIn {
+      animation: fadeIn 0.8s cubic-bezier(.4,0,.2,1) both;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar px-6 py-4">
+    <div class="container mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <i class="fas fa-utensils text-2xl text-primary"></i>
+        <span class="text-xl font-bold">NourishHub</span>
+      </div>
+      
+      <div class="hidden md:flex space-x-6">
+        <a href="#" class="nav-link font-medium">Home</a>
+        <a href="#menu" class="nav-link font-medium">Menu</a>
+        <a href="#features" class="nav-link font-medium">Features</a>
+        <a href="#" class="nav-link font-medium">My Orders</a>
+        <a href="#" class="nav-link font-medium">Contact</a>
+      </div>
+      
+      <div class="flex items-center space-x-4">
+        <!-- Cart Icon -->
+        <button class="relative" id="cart-btn">
+          <i class="fas fa-shopping-cart text-2xl text-primary"></i>
+          <span id="cart-count" class="absolute -top-2 -right-2 bg-danger text-white text-xs rounded-full px-2 py-0.5">0</span>
+        </button>
+        <button class="btn-primary px-4 py-2 rounded-lg font-medium">Login</button>
+        <button class="md:hidden" id="menu-toggle">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div class="mobile-menu md:hidden" id="mobile-menu">
+      <a href="#" class="nav-link py-2">Home</a>
+      <a href="#menu" class="nav-link py-2">Menu</a>
+      <a href="#features" class="nav-link py-2">Features</a>
+      <a href="#" class="nav-link py-2">My Orders</a>
+      <a href="#" class="nav-link py-2">Contact</a>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero relative overflow-hidden py-20">
+    <div class="blob top-0 right-0 transform translate-x-1/2 -translate-y-1/2"></div>
+    <div class="blob bottom-0 left-0 transform -translate-x-1/2 translate-y-1/2"></div>
+    
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="max-w-2xl mx-auto text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">Delicious Food, Delivered Fast</h1>
+        <p class="text-xl mb-8">Order from our canteen and enjoy fresh meals prepared with love. Track your order in real-time from preparation to delivery.</p>
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+          <button class="btn-primary px-6 py-3 rounded-lg font-medium text-lg">Order Now</button>
+          <button class="bg-white text-primary px-6 py-3 rounded-lg font-medium text-lg border border-primary">View Menu</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Section -->
+  <section class="py-16 bg-white" id="features">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Why Choose NourishHub?</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="feature-card p-6 rounded-xl bg-gradient-to-br from-blue-50 to-purple-50">
+          <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-bolt text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Fast Delivery</h3>
+          <p class="text-gray-600">Get your food delivered within 15-20 minutes after ordering.</p>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="feature-card p-6 rounded-xl bg-gradient-to-br from-green-50 to-blue-50">
+          <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-qrcode text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">QR Code Tracking</h3>
+          <p class="text-gray-600">Track your order status in real-time with a unique QR code.</p>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="feature-card p-6 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50">
+          <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mb-4">
+            <i class="fas fa-shield-alt text-white text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Secure Payments</h3>
+          <p class="text-gray-600">Pay with Razorpay or Stripe - your payment details are always secure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Menu Section -->
+  <section class="py-16 bg-gray-50" id="menu">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">Our Menu</h2>
+      
+      <!-- Menu Filters -->
+      <div class="flex flex-wrap justify-center gap-2 mb-8">
+        <button class="px-4 py-2 rounded-full bg-primary text-white">All</button>
+        <button class="px-4 py-2 rounded-full bg-white border border-gray-300">Breakfast</button>
+        <button class="px-4 py-2 rounded-full bg-white border border-gray-300">Lunch</button>
+        <button class="px-4 py-2 rounded-full bg-white border border-gray-300">Snacks</button>
+        <button class="px-4 py-2 rounded-full bg-white border border-gray-300">Drinks</button>
+      </div>
+      
+      <!-- Menu Items -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Menu Item 1 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80" 
+                 alt="Salad" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹120</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Fresh Salad Bowl</h3>
+            <p class="text-gray-600 text-sm mb-3">Healthy mix of greens, veggies and dressing</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menu Item 2 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80" 
+                 alt="Pizza" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹180</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Margherita Pizza</h3>
+            <p class="text-gray-600 text-sm mb-3">Classic pizza with tomato sauce and mozzarella</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.8</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menu Item 3 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80" 
+                 alt="Burger" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹150</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Cheese Burger</h3>
+            <p class="text-gray-600 text-sm mb-3">Juicy beef patty with cheese and fresh veggies</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.6</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menu Item 4 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80" 
+                 alt="Pasta" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹160</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Creamy Pasta</h3>
+            <p class="text-gray-600 text-sm mb-3">Penne pasta in rich white sauce with herbs</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.7</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menu Item 5 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=880&q=80" 
+                 alt="Dosa" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹80</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Masala Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Crispy dosa stuffed with spicy potato filling</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.9</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menu Item 6 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1464306076886-debede6b400b?auto=format&fit=crop&w=880&q=80" 
+                 alt="Sandwich" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹60</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Veg Sandwich</h3>
+            <p class="text-gray-600 text-sm mb-3">Fresh veggies layered between soft bread slices</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.4</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Menu Item 7 -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48">
+            <img src="https://images.unsplash.com/photo-1505250461400-41d2a6fd6005?auto=format&fit=crop&w=880&q=80" 
+                 alt="Juice" class="w-full h-full object-cover">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹40</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Fresh Orange Juice</h3>
+            <p class="text-gray-600 text-sm mb-3">Refreshing juice made from fresh oranges</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.7</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Idly -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Idly" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹20</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Idly</h3>
+            <p class="text-gray-600 text-sm mb-3">Soft steamed rice cakes</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.6</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vada -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80" alt="Vada" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹15</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Vada</h3>
+            <p class="text-gray-600 text-sm mb-3">Crispy fried lentil doughnuts</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kara Bath -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Kara Bath" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹20</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Kara Bath</h3>
+            <p class="text-gray-600 text-sm mb-3">Spicy rice dish</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.4</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kesribath -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Kesribath" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹20</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Kesribath</h3>
+            <p class="text-gray-600 text-sm mb-3">Sweet semolina dessert</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.3</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rice Bath -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Rice Bath" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹20</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Rice Bath</h3>
+            <p class="text-gray-600 text-sm mb-3">Flavored rice dish</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.4</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Combo Ricebath -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Combo Ricebath" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹30</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Combo Ricebath</h3>
+            <p class="text-gray-600 text-sm mb-3">Rice bath combo special</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shyavige Bath -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Shyavige Bath" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹35</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Shyavige Bath</h3>
+            <p class="text-gray-600 text-sm mb-3">Vermicelli rice dish</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Masala Dosa -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Masala Dosa" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹30</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Masala Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Crispy dosa with potato filling</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.7</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plain Dosa -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Plain Dosa" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹40</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Plain Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Classic crispy dosa</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.6</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Set Dosa -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Set Dosa" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹35</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Set Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Soft dosa set</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kali Dosa -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Kali Dosa" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹30</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Kali Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Soft thick dosa</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.4</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pudi Masala Dosa -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Pudi Masala Dosa" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹30</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Pudi Masala Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Dosa with spicy powder and potato filling</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.6</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parota Curry (2) -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80" alt="Parota Curry" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹45</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Parota Curry (2)</h3>
+            <p class="text-gray-600 text-sm mb-3">2 Parotas with curry</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.7</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curd Rice -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Curd Rice" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹40</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Curd Rice</h3>
+            <p class="text-gray-600 text-sm mb-3">Rice mixed with curd</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Onion Dosa -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80" alt="Onion Dosa" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹35</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Onion Dosa</h3>
+            <p class="text-gray-600 text-sm mb-3">Dosa topped with onions</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.5</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coffee or Tea -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80" alt="Coffee or Tea" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹40</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Coffee or Tea</h3>
+            <p class="text-gray-600 text-sm mb-3">Hot beverage</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.6</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Badam Milk -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80" alt="Badam Milk" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹10</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">Badam Milk</h3>
+            <p class="text-gray-600 text-sm mb-3">Almond flavored milk</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.4</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- By Two Coffee -->
+        <div class="menu-card">
+          <div class="relative overflow-hidden h-48 flex items-center justify-center bg-gray-100">
+            <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80" alt="By Two Coffee" class="w-32 h-32 object-cover rounded-full">
+            <div class="absolute top-2 right-2 bg-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span class="text-sm font-bold text-primary">₹15</span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1">By Two Coffee</h3>
+            <p class="text-gray-600 text-sm mb-3">Shared cup of coffee</p>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center">
+                <i class="fas fa-star text-yellow-400 mr-1"></i>
+                <span class="text-sm">4.3</span>
+              </div>
+              <button class="text-primary font-medium">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-10">
+        <button class="btn-primary px-6 py-3 rounded-lg font-medium">View Full Menu</button>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Order Tracking Section -->
+  <section class="py-16 bg-white">
+    <div class="container mx-auto px-6">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-center mb-12">Track Your Order</h2>
+        
+        <div class="bg-gray-50 p-6 rounded-xl">
+          <div class="flex flex-col md:flex-row items-center justify-between mb-6">
+            <div class="mb-4 md:mb-0">
+              <h3 class="font-semibold">Order #12345</h3>
+              <p class="text-gray-600">Placed on 15 June 2023, 12:30 PM</p>
+            </div>
+            <div class="bg-primary text-white px-4 py-2 rounded-lg">
+              Preparing
+            </div>
+          </div>
+          
+          <!-- Order Progress -->
+          <div class="relative">
+            <!-- Progress Line -->
+            <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 transform -translate-y-1/2"></div>
+            <div class="absolute top-1/2 left-0 h-1 bg-primary transform -translate-y-1/2" style="width: 33%"></div>
+            
+            <!-- Steps -->
+            <div class="flex justify-between relative z-10">
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center mb-2">
+                  <i class="fas fa-check text-white"></i>
+                </div>
+                <span class="text-sm font-medium">Ordered</span>
+              </div>
+              
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center mb-2">
+                  <i class="fas fa-utensils text-white"></i>
+                </div>
+                <span class="text-sm font-medium">Preparing</span>
+              </div>
+              
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mb-2">
+                  <i class="fas fa-check text-gray-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-500">Ready</span>
+              </div>
+              
+              <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mb-2">
+                  <i class="fas fa-check text-gray-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-500">Delivered</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- QR Code -->
+          <div class="mt-10 flex flex-col items-center">
+            <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://nourishhub.com/order/12345" 
+                   alt="Order QR Code" class="w-32 h-32">
+            </div>
+            <p class="text-gray-600 text-sm">Scan this QR code to track your order status</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Testimonials -->
+  <section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-12">What Our Customers Say</h2>
+      
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-white p-8 rounded-xl shadow-sm">
+          <div class="flex items-center mb-6">
+            <img src="https://randomuser.me/api/portraits/indianwomen/44.jpg" 
+                 alt="Customer" class="w-12 h-12 rounded-full mr-4">
+            <div>
+              <h4 class="font-semibold">Priya Sharma</h4>
+              <div class="flex">
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+                <i class="fas fa-star text-yellow-400"></i>
+              </div>
+            </div>
+          </div>
+          <p class="text-gray-700 italic">
+            "The food is always fresh and delicious. I love the QR code tracking feature that lets me know exactly when my order will be ready. The delivery is super fast too!"
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="py-16 bg-primary text-white">
+    <div class="container mx-auto px-6 text-center">
+      <h2 class="text-3xl font-bold mb-6">Ready to Order?</h2>
+      <p class="text-xl mb-8 max-w-2xl mx-auto">Join thousands of satisfied customers enjoying delicious meals from our canteen.</p>
+      <button class="bg-white text-primary px-8 py-3 rounded-lg font-medium text-lg" id="pay-now-btn">Get Started</button>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-12">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <div class="flex items-center space-x-2 mb-4">
+            <i class="fas fa-utensils text-2xl text-primary"></i>
+            <span class="text-xl font-bold">NourishHub</span>
+          </div>
+          <p class="text-gray-400">Delivering delicious meals with love since 2020.</p>
+          <div class="flex space-x-4 mt-4">
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="font-bold text-lg mb-4">Quick Links</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">Home</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Menu</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">My Orders</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="font-bold text-lg mb-4">Support</h3>
+          <ul class="space-y-2">
+            <li><a href="#" class="text-gray-400 hover:text-white">FAQs</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Terms of Service</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white">Refund Policy</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="font-bold text-lg mb-4">Contact</h3>
+          <ul class="space-y-2 text-gray-400">
+            <li class="flex items-start">
+              <i class="fas fa-map-marker-alt mt-1 mr-2"></i>
+              <span>123 Food Street, Bangalore, India</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-phone-alt mr-2"></i>
+              <span>+91 9876543210</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-envelope mr-2"></i>
+              <span>hello@nourishhub.com</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-10 pt-6 text-center text-gray-400">
+        <p>&copy; <span id="current-year">2023</span> NourishHub. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Customer Signup Modal -->
+<div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg p-8 w-full max-w-md shadow-lg relative">
+    <button id="close-modal" class="absolute top-2 right-2 text-gray-500 hover:text-primary text-xl">&times;</button>
+    <h2 class="text-2xl font-bold mb-4">Customer Form</h2>
+    <form action="save_customer.php" method="post" class="space-y-4">
+      <div>
+        <label class="block font-medium mb-1">Name:</label>
+        <input type="text" name="name" required class="form-input w-full">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Email:</label>
+        <input type="email" name="email" required class="form-input w-full">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Phone:</label>
+        <input type="tel" name="phone" class="form-input w-full">
+      </div>
+      <div>
+        <label class="block font-medium mb-1">Address:</label>
+        <textarea name="address" class="form-input w-full"></textarea>
+      </div>
+      <button type="submit" class="btn-primary px-4 py-2 rounded-lg w-full">Save Customer</button>
+    </form>
+  </div>
+</div>
+
+<!-- Payment Method Modal -->
+<div id="payment-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg p-8 w-full max-w-lg shadow-lg relative">
+    <button id="close-payment-modal" class="absolute top-2 right-2 text-gray-500 hover:text-primary text-xl">&times;</button>
+    <h2 class="text-2xl font-bold mb-4 text-center">Canteen Payment</h2>
+    <div class="mb-4">
+      <h4 class="font-semibold mb-3">Select Payment Method:</h4>
+      <div class="space-y-3">
+        <div class="payment-method border-2 border-gray-200 rounded-lg p-4 cursor-pointer flex items-center" onclick="selectPayment('Cash', event)">
+          <i class="fas fa-money-bill-wave text-2xl text-primary mr-3"></i>
+          <div>
+            <h5 class="mb-0 font-bold">Cash</h5>
+            <small class="text-gray-500">Pay with physical currency</small>
+          </div>
+        </div>
+        <div class="payment-method border-2 border-primary rounded-lg p-4 cursor-pointer flex items-center active" onclick="selectPayment('Card', event)">
+          <i class="fas fa-credit-card text-2xl text-primary mr-3"></i>
+          <div>
+            <h5 class="mb-0 font-bold">Card</h5>
+            <small class="text-gray-500">Credit or Debit card payment</small>
+          </div>
+        </div>
+        <div class="payment-method border-2 border-gray-200 rounded-lg p-4 cursor-pointer flex items-center" onclick="selectPayment('UPI', event)">
+          <i class="fas fa-mobile-alt text-2xl text-primary mr-3"></i>
+          <div>
+            <h5 class="mb-0 font-bold">UPI</h5>
+            <small class="text-gray-500">Unified Payments Interface</small>
+          </div>
+        </div>
+        <div class="payment-method border-2 border-gray-200 rounded-lg p-4 cursor-pointer flex items-center" onclick="selectPayment('QR Code', event)">
+          <i class="fas fa-qrcode text-2xl text-primary mr-3"></i>
+          <div>
+            <h5 class="mb-0 font-bold">QR Code</h5>
+            <small class="text-gray-500">Scan to pay instantly</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="btn-primary px-6 py-2 rounded-full w-full font-semibold mt-4" onclick="proceedToPay()">Proceed to Pay</button>
+    <div class="selected-text bg-blue-50 border-l-4 border-blue-400 p-3 rounded mt-4">
+      <p class="mb-0 payment-text text-gray-700">You selected <strong>"Card"</strong> as your payment method.</p>
+    </div>
+  </div>
+</div>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.toggle('active');
+    });
+    
+    // Set current year in footer
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    
+    // Simple form validation example (would be more comprehensive in a real app)
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const inputs = form.querySelectorAll('input[required], textarea[required]');
+        let isValid = true;
+        
+        inputs.forEach(input => {
+          if (!input.value.trim()) {
+            input.classList.add('border-red-500');
+            isValid = false;
+          } else {
+            input.classList.remove('border-red-500');
+          }
+        });
+        
+        if (isValid) {
+          // In a real app, you would submit the form here
+          alert('Form submitted successfully!');
+          form.reset();
+        }
+      });
+    });
+    
+    // Animation on scroll
+    const observerOptions = {
+      threshold: 0.1
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-fadeIn');
+        }
+      });
+    }, observerOptions);
+    
+    document.querySelectorAll('.feature-card, .menu-card').forEach(card => {
+      observer.observe(card);
+    });
+    
+    // Show modal on Login button click
+    document.querySelectorAll('.btn-primary').forEach(btn => {
+    if (btn.textContent.trim() === 'Login') {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('customer-modal').classList.remove('hidden');
+      });
+    }
+  });
+  
+  // Close modal
+  document.getElementById('close-modal').onclick = function() {
+    document.getElementById('customer-modal').classList.add('hidden');
+  };
+
+  // Payment Modal Logic
+  let selectedMethod = 'Card';
+
+  function selectPayment(method, event) {
+    selectedMethod = method;
+    document.querySelectorAll('#payment-modal .payment-method').forEach(el => {
+      el.classList.remove('border-primary', 'active', 'bg-blue-50');
+      el.classList.add('border-gray-200');
+    });
+    event.currentTarget.classList.add('border-primary', 'active', 'bg-blue-50');
+    event.currentTarget.classList.remove('border-gray-200');
+    document.querySelector('#payment-modal .selected-text p').innerHTML =
+      `You selected <strong>"${method}"</strong> as your payment method.`;
+  }
+
+  function proceedToPay() {
+    alert(`Processing payment via ${selectedMethod}...`);
+    // Add payment processing logic here
+  }
+
+  // Show Payment Modal
+  document.getElementById('pay-now-btn')?.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('payment-modal').classList.remove('hidden');
+  });
+
+  // Close Payment Modal
+  document.getElementById('close-payment-modal').onclick = function() {
+    document.getElementById('payment-modal').classList.add('hidden');
+  };
+  </script>
+</body>
+</html>
